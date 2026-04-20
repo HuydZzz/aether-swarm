@@ -146,7 +146,6 @@ aether-swarm/
 │   ├── DEMO_SCENARIOS.md     Three demo scenarios (Blackout Rescue + 2)
 │   └── ROADMAP.md            Future scale plan (50+ agents, BFT, CRDT memory)
 ├── PITCH.md                  Hackathon pitch
-├── DEMO_VIDEO_SCRIPT.md      Step-by-step recording script
 ├── requirements.txt
 └── LICENSE
 ```
