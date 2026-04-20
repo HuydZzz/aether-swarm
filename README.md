@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="logo.png" alt="Aether Swarm" width="120" />
+
 # AETHER SWARM
 
 ### The Ghost Protocol — a Vertex-native coordination substrate for heterogeneous machine swarms
