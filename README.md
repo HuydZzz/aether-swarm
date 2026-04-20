@@ -44,58 +44,52 @@ I reviewed the three strongest public Track 1 submissions. Their gaps:
 
 Full teardown: [`docs/COMPETITIVE_EDGE.md`](docs/COMPETITIVE_EDGE.md).
 
-## Quick start (3 minutes)
+## Live visual demo (no install)
 
-### 0. Prerequisites
+Open **[`public/index.html`](public/index.html)** in a browser — that's it. You'll see the mesh animate, agents discover each other, tasks get self-allocated via stigmergic affinity, and you get chaos buttons (`Kill`, `Revive`, `Fault`, `Byzantine`, `Auto-run`) to break the swarm live while recording.
 
-- Python 3.9+
-- A reachable FoxMQ broker (Tashi Vertex). Same broker as the warm-up; default `127.0.0.1:1883`.
-- `pip install -r requirements.txt`
+The demo is deployed to Vercel the same way as the warm-up (see `vercel.json`) — deploy with one click, or just open the file directly.
 
-### 1. Set credentials
+Keyboard shortcuts while the demo has focus:
+
+| Key | Action |
+|-----|--------|
+| `K` | Kill target agent |
+| `R` | Revive target agent |
+| `F` | Trigger mesh-wide FREEZE from target |
+| `U` | UNFREEZE the mesh |
+| `B` | Turn target Byzantine (broadcast fake pheromones) |
+| `N` | Turn Byzantine off |
+| `A` | Auto-run the full chaos script end-to-end |
+| `Esc` | Reset simulation |
+
+The visual demo is a faithful simulation of the Python implementation's behaviour — same agent roles, same three pillars, same chaos actions. The **real Vertex integration** lives in the Python source; the HTML demo is designed for judge-friendly demonstration and video recording.
+
+## For developers — run the real Vertex-backed mesh
+
+If you want to see the actual Vertex integration running (not the visual sim), spin up the Python mesh:
 
 ```bash
+pip install -r requirements.txt
+
 export VERTEX_USER=demo
 export VERTEX_PASS=demo            # or your hackathon-issued credentials
-export VERTEX_HOST=127.0.0.1       # optional, defaults to localhost
-export VERTEX_PORT=1883            # optional
-```
+export VERTEX_HOST=127.0.0.1
+export VERTEX_PORT=1883
 
-### 2. Spin up the mesh (one terminal)
-
-```bash
+# Terminal 1: spawn 8 heterogeneous agents
 ./demo/run_mesh.sh
-```
 
-This spawns **8 heterogeneous agents** (1 coordinator seeding 6 tasks + 3 drones + 2 AMRs + 2 IoT sensors). Each agent's stdout goes to `logs/<agent-id>.log`.
-
-### 3. Open the live dashboard (second terminal)
-
-```bash
+# Terminal 2: live dashboard (Vertex subscriber)
 python3 -m demo.dashboard
-```
 
-Watch peers discover each other, tasks get committed, completions roll in.
-
-### 4. Break it (third terminal — judge controls)
-
-```bash
-# kill an agent — its tasks return to the market, twin goes ghost
+# Terminal 3: chaos trigger CLI
 python3 -m demo.chaos kill drone-01
-
-# revive — twin reactivates
-python3 -m demo.chaos revive drone-01
-
-# trigger a mesh-wide safety FREEZE
 python3 -m demo.chaos fault iot-01 thermal_anomaly
-python3 -m demo.chaos resume iot-01
-
-# inject a Byzantine agent broadcasting fabricated pheromones
 python3 -m demo.chaos byzantine-on amr-02
-python3 -m demo.chaos byzantine-off amr-02
 ```
 
-The mesh continues operating through every chaos action. No cloud. No human in the loop beyond the chaos triggers themselves.
+All Python code is Vertex-native — every pillar publishes/subscribes through [`src/vertex_adapter.py`](src/vertex_adapter.py), the single seam to FoxMQ. Grep for `paho` or `mqtt`: one file only.
 
 ## Architecture
 
@@ -145,7 +139,10 @@ aether-swarm/
 │   ├── COMPETITIVE_EDGE.md   Teardown of competitor repos
 │   ├── DEMO_SCENARIOS.md     Three demo scenarios (Blackout Rescue + 2)
 │   └── ROADMAP.md            Future scale plan (50+ agents, BFT, CRDT memory)
+├── public/
+│   └── index.html            Interactive visual demo (open in browser)
 ├── PITCH.md                  Hackathon pitch
+├── vercel.json               One-click Vercel deployment
 ├── requirements.txt
 └── LICENSE
 ```
